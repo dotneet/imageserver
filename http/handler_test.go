@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"net/http"
@@ -98,7 +99,7 @@ func TestHandler(t *testing.T) {
 		{
 			name: "SourceParamError",
 			url:  "http://localhost",
-			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &imageserver.ParamError{
 					Param:   imageserver_source.Param,
 					Message: "error",
@@ -109,7 +110,7 @@ func TestHandler(t *testing.T) {
 		{
 			name: "ParamError",
 			url:  "http://localhost",
-			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &imageserver.ParamError{
 					Param:   "foobar",
 					Message: "error",
@@ -120,7 +121,7 @@ func TestHandler(t *testing.T) {
 		{
 			name: "ImageError",
 			url:  "http://localhost",
-			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &imageserver.ImageError{
 					Message: "error",
 				}
@@ -130,7 +131,7 @@ func TestHandler(t *testing.T) {
 		{
 			name: "InternalError",
 			url:  "http://localhost",
-			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, fmt.Errorf("error")
 			}),
 			expectedStatusCode:    http.StatusInternalServerError,

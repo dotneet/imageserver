@@ -1,6 +1,7 @@
 package groupcache
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -21,14 +22,14 @@ var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	srv := newTestServer(
-		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {
 			return "test"
 		}),
 	)
-	im, err := srv.Get(imageserver.Params{
+	im, err := srv.Get(context.Background(), imageserver.Params{
 		imageserver_source.Param: testdata.MediumFileName,
 	})
 	if err != nil {
@@ -41,14 +42,14 @@ func TestServer(t *testing.T) {
 
 func TestServerErrorGroup(t *testing.T) {
 	srv := newTestServer(
-		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 		imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {
 			return "test"
 		}),
 	)
-	_, err := srv.Get(imageserver.Params{})
+	_, err := srv.Get(context.Background(), imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -67,7 +68,7 @@ func TestServerErrorImageUnmarshal(t *testing.T) {
 			return "test"
 		}),
 	}
-	_, err := srv.Get(imageserver.Params{})
+	_, err := srv.Get(context.Background(), imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -90,7 +91,7 @@ func TestGetter(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 	}
@@ -112,7 +113,7 @@ func TestGetterErrorContextType(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 	}
@@ -127,7 +128,7 @@ func TestGetterErrorContextNil(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 	}
@@ -144,7 +145,7 @@ func TestGetterErrorParamsNil(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 	}
@@ -161,7 +162,7 @@ func TestGetterErrorServer(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 	}
@@ -178,7 +179,7 @@ func TestGetterErrorImageMarshal(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return &imageserver.Image{
 				Format: strings.Repeat("a", imageserver.ImageFormatMaxLen+1),
 			}, nil
@@ -196,7 +197,7 @@ func TestGetterErrorSink(t *testing.T) {
 	}
 	dest := groupcache.AllocatingByteSliceSink(nil)
 	gt := &Getter{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 	}
