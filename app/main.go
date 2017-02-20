@@ -50,7 +50,9 @@ var (
 )
 
 func main() {
-	parseFlags()
+	if err := parseFlags(); err != nil {
+		panic(err)
+	}
 	startHTTPServer()
 }
 
