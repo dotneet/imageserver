@@ -1,0 +1,21 @@
+bind: "localhost:8080"
+#cache:
+#    redis:
+#    host: "localhost:6379"
+#  memory:
+#    maxSize: 10000000
+#  memcached:
+#    host: "localhost:11211"
+#  groupchache:
+#    peers: localhost
+#    name: imageserver
+#    maxSize: 10000000
+#    statsPath: ""
+#  file:
+#    path: /tmp
+source:
+  file:
+    path: /tmp
+#  http:
+#    urlprefix: "http://example.com/"
+    
