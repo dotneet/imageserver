@@ -1,6 +1,6 @@
 bind: "localhost:8080"
 #cache:
-#    redis:
+#  redis:
 #    host: "localhost:6379"
 #  memory:
 #    maxSize: 10000000
@@ -13,9 +13,14 @@ bind: "localhost:8080"
 #    statsPath: ""
 #  file:
 #    path: /tmp
+#processor:
+#  resize:
+#    maxWidth: 1024
+#    maxHeight: 1024
+#    enableMaxArea: 480000
 source:
   file:
     path: /tmp
 #  http:
-#    urlprefix: "http://example.com/"
+#    urlPrefix: "http://example.com/"
     
