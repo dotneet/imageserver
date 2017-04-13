@@ -7,6 +7,7 @@ import (
 	"github.com/disintegration/gift"
 	"github.com/pierrre/imageserver"
 	imageserver_image_internal "github.com/pierrre/imageserver/image/internal"
+	"bytes"
 )
 
 const (
@@ -34,6 +35,8 @@ type ResizeProcessor struct {
 	DefaultResampling gift.Resampling
 	MaxWidth          int
 	MaxHeight         int
+	// if image's area is larger than EnableMaxArea skip processing. area = width * height
+	EnableMaxArea     int
 }
 
 // Process implements imageserver/image.Processor.
@@ -153,11 +156,18 @@ func (prc *ResizeProcessor) getResampling(params imageserver.Params) (gift.Resam
 }
 
 // Change implements imageserver/image.Processor.
-func (prc *ResizeProcessor) Change(params imageserver.Params) bool {
+func (prc *ResizeProcessor) Change(im *imageserver.Image, params imageserver.Params) bool {
 	if !params.Has(resizeParam) {
 		return false
 	}
-	params, err := params.GetParams(resizeParam)
+	config, _, err := image.DecodeConfig(bytes.NewReader(im.Data))
+	if err != nil {
+		return true
+	}
+	if prc.EnableMaxArea > 0 && config.Width * config.Height > prc.EnableMaxArea {
+		return  false
+	}
+	params, err = params.GetParams(resizeParam)
 	if err != nil {
 		return true
 	}

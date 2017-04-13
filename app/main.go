@@ -15,7 +15,7 @@ import (
 	"github.com/disintegration/gift"
 	"github.com/garyburd/redigo/redis"
 	"github.com/golang/groupcache"
-	imageserver "github.com/pierrre/imageserver"
+	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_cache_file "github.com/pierrre/imageserver/cache/file"
 	imageserver_cache_groupcache "github.com/pierrre/imageserver/cache/groupcache"
@@ -30,7 +30,6 @@ import (
 	imageserver_image "github.com/pierrre/imageserver/image"
 	_ "github.com/pierrre/imageserver/image/bmp"
 	imageserver_image_crop "github.com/pierrre/imageserver/image/crop"
-	imageserver_image_gamma "github.com/pierrre/imageserver/image/gamma"
 	imageserver_image_gif "github.com/pierrre/imageserver/image/gif"
 	imageserver_image_gift "github.com/pierrre/imageserver/image/gift"
 	_ "github.com/pierrre/imageserver/image/jpeg"
@@ -46,7 +45,6 @@ import (
 var (
 	config     imageserver.Configuration
 	flagConfig = "config.yml"
-	flagCache  = int64(128 * (1 << 20))
 )
 
 func main() {
@@ -151,21 +149,21 @@ func newServerFile(srv imageserver.Server) imageserver.Server {
 }
 
 func newServerImage(srv imageserver.Server) imageserver.Server {
+	processors := imageserver_image.ListProcessor([]imageserver_image.Processor{
+		&imageserver_image_crop.Processor{},
+		&imageserver_image_gift.RotateProcessor{
+			DefaultInterpolation: gift.CubicInterpolation,
+		},
+		&imageserver_image_gift.ResizeProcessor{
+			DefaultResampling: gift.LanczosResampling,
+			MaxWidth:          config.Processor.Resize.MaxWidth,
+			MaxHeight:         config.Processor.Resize.MaxHeight,
+			EnableMaxArea:     config.Processor.Resize.EnableMaxArea,
+		},
+	})
+
 	basicHdr := &imageserver_image.Handler{
-		Processor: imageserver_image_gamma.NewCorrectionProcessor(
-			imageserver_image.ListProcessor([]imageserver_image.Processor{
-				&imageserver_image_crop.Processor{},
-				&imageserver_image_gift.RotateProcessor{
-					DefaultInterpolation: gift.CubicInterpolation,
-				},
-				&imageserver_image_gift.ResizeProcessor{
-					DefaultResampling: gift.LanczosResampling,
-					MaxWidth:          2048,
-					MaxHeight:         2048,
-				},
-			}),
-			true,
-		),
+		Processor: processors,
 	}
 	gifHdr := &imageserver_image_gif.FallbackHandler{
 		Handler: &imageserver_image_gif.Handler{
@@ -177,8 +175,9 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 					},
 					&imageserver_image_gift.ResizeProcessor{
 						DefaultResampling: gift.NearestNeighborResampling,
-						MaxWidth:          1024,
-						MaxHeight:         1024,
+						MaxWidth:          config.Processor.Resize.MaxWidth,
+						MaxHeight:         config.Processor.Resize.MaxHeight,
+						EnableMaxArea:     config.Processor.Resize.EnableMaxArea,
 					},
 				}),
 			},

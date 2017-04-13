@@ -25,7 +25,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 	if im.Format != "gif" {
 		return nil, &imageserver.ImageError{Message: fmt.Sprintf("image format is not gif: %s", im.Format)}
 	}
-	if !hdr.Processor.Change(params) {
+	if !hdr.Processor.Change(im, params) {
 		return im, nil
 	}
 	g, err := gif.DecodeAll(bytes.NewReader(im.Data))

@@ -83,6 +83,6 @@ func (prc *Processor) crop(im image.Image, bds image.Rectangle) (image.Image, er
 }
 
 // Change implements imageserver/image.Processor.
-func (prc *Processor) Change(params imageserver.Params) bool {
+func (prc *Processor) Change(im *imageserver.Image, params imageserver.Params) bool {
 	return params.Has(param)
 }

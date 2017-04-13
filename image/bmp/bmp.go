@@ -19,7 +19,7 @@ func (enc *Encoder) Encode(w io.Writer, nim image.Image, params imageserver.Para
 }
 
 // Change implements imageserver/image.Encoder.
-func (enc *Encoder) Change(params imageserver.Params) bool {
+func (enc *Encoder) Change(im *imageserver.Image, params imageserver.Params) bool {
 	return false
 }
 

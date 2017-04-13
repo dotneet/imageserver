@@ -47,10 +47,10 @@ func (hdr *Handler) change(im *imageserver.Image, format string, enc Encoder, pa
 	if format != im.Format {
 		return true
 	}
-	if hdr.Processor != nil && hdr.Processor.Change(params) {
+	if hdr.Processor != nil && hdr.Processor.Change(im, params) {
 		return true
 	}
-	if enc.Change(params) {
+	if enc.Change(im, params) {
 		return true
 	}
 	return false

@@ -7,6 +7,7 @@ import (
 
 	"github.com/nfnt/resize"
 	"github.com/pierrre/imageserver"
+	"bytes"
 )
 
 const (
@@ -34,6 +35,7 @@ type Processor struct {
 	DefaultInterpolation resize.InterpolationFunction
 	MaxWidth             int
 	MaxHeight            int
+	EnableMaxArea        int
 }
 
 // Process implements imageserver/image.Processor.
@@ -154,11 +156,18 @@ func getModeFunc(params imageserver.Params) (modeFunc, error) {
 }
 
 // Change implements imageserver/image.Processor.
-func (prc *Processor) Change(params imageserver.Params) bool {
+func (prc *Processor) Change(im *imageserver.Image, params imageserver.Params) bool {
 	if !params.Has(param) {
 		return false
 	}
-	params, err := params.GetParams(param)
+	config, _, err := image.DecodeConfig(bytes.NewReader(im.Data))
+	if err != nil {
+		return true
+	}
+	if prc.EnableMaxArea > 0 && config.Width * config.Height > prc.EnableMaxArea {
+		return  false
+	}
+	params, err = params.GetParams(param)
 	if err != nil {
 		return true
 	}

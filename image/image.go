@@ -5,5 +5,5 @@ import "github.com/pierrre/imageserver"
 
 // Changer returns true if the Image could change for the given Params.
 type Changer interface {
-	Change(imageserver.Params) bool
+	Change(*imageserver.Image, imageserver.Params) bool
 }

@@ -2,10 +2,10 @@
 package imageserver
 
 type Configuration struct {
-	Bind    string
-	Parsers []string
-	Cache   CacheConfiguration
-	Source  SourceConfiguration
+	Bind       string
+	Processor  ProcessorConfiguration
+	Cache      CacheConfiguration
+	Source     SourceConfiguration
 }
 
 type CacheConfiguration struct {
@@ -27,8 +27,8 @@ type MemcachedConfiguration struct {
 type GroupcacheConfiguration struct {
 	Peers     string
 	Name      string
-	MaxSize   int64
-	StatsPath string
+	MaxSize   int64		`yaml:"maxSize"`
+	StatsPath string	`yaml:"statsPath"`
 }
 
 type MemoryCacheConfiguration struct {
@@ -45,9 +45,19 @@ type SourceConfiguration struct {
 }
 
 type HttpSourceConfiguration struct {
-	UrlPrefix string
+	UrlPrefix string	`yaml:"urlPrefix"`
 }
 
 type FileSourceConfiguration struct {
 	Path string
+}
+
+type ProcessorConfiguration struct {
+	Resize ResizeProcessorConfiguration
+}
+
+type ResizeProcessorConfiguration struct {
+	MaxWidth      int	`yaml:"maxWidth"`
+	MaxHeight     int	`yaml:"maxHeight"`
+	EnableMaxArea int	`yaml:"enableMaxArea"`
 }

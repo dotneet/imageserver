@@ -132,7 +132,7 @@ func (prc *RotateProcessor) getInterpolation(params imageserver.Params) (gift.In
 }
 
 // Change implements imageserver/image.Processor.
-func (prc *RotateProcessor) Change(params imageserver.Params) bool {
+func (prc *RotateProcessor) Change(im *imageserver.Image, params imageserver.Params) bool {
 	if !params.Has(rotateParam) {
 		return false
 	}

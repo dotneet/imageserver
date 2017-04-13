@@ -43,9 +43,9 @@ func (prc ListProcessor) Process(nim image.Image, params imageserver.Params) (im
 }
 
 // Change implements Processor.
-func (prc ListProcessor) Change(params imageserver.Params) bool {
+func (prc ListProcessor) Change(im *imageserver.Image, params imageserver.Params) bool {
 	for _, p := range prc {
-		if p.Change(params) {
+		if p.Change(im, params) {
 			return true
 		}
 	}
