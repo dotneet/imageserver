@@ -1,11 +1,19 @@
 all: build test lint
 
 build: \
+	build-app \
+	build-app-linux-amd64 \
 	build-example-simple \
 	build-example-cache \
 	build-example-httpsource \
 	build-example-groupcache \
 	build-example-advanced
+
+build-app: app/main.go
+	go build -o build/app app/main.go
+
+build-app-linux-amd64: app/main.go
+	GOOS=linux GOARCH=amd64 go build -o build/app_linux_amd64 app/main.go
 
 build-example-simple:
 	go build -v -i -o build/example-simple ./examples/simple
