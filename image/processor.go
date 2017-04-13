@@ -61,3 +61,9 @@ type ChangeProcessor struct {
 func (prc *ChangeProcessor) Change(params imageserver.Params) bool {
 	return true
 }
+
+type RawDataProcessor interface {
+	Process(*imageserver.Image, imageserver.Params) (*imageserver.Image, error)
+	Changer
+}
+

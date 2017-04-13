@@ -54,10 +54,17 @@ type FileSourceConfiguration struct {
 
 type ProcessorConfiguration struct {
 	Resize ResizeProcessorConfiguration
+	Pngquant PngquantProcessorConfiguration
 }
 
 type ResizeProcessorConfiguration struct {
 	MaxWidth      int	`yaml:"maxWidth"`
 	MaxHeight     int	`yaml:"maxHeight"`
+	EnableMaxArea int	`yaml:"enableMaxArea"`
+}
+
+type PngquantProcessorConfiguration struct {
+	Command 	string
+	Speed		string
 	EnableMaxArea int	`yaml:"enableMaxArea"`
 }

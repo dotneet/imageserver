@@ -40,6 +40,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"net/url"
 	"strings"
+	"github.com/pierrre/imageserver/image/pngquant"
 )
 
 var (
@@ -162,7 +163,17 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 		},
 	})
 
+	rawDataProcessors := []imageserver_image.RawDataProcessor{}
+	if config.Processor.Pngquant.Command != "" {
+		rawDataProcessors = append(rawDataProcessors, &pngquant.Processor{
+			Command: config.Processor.Pngquant.Command,
+			Speed: config.Processor.Pngquant.Speed,
+			EnableMaxArea: config.Processor.Pngquant.EnableMaxArea,
+		})
+	}
+
 	basicHdr := &imageserver_image.Handler{
+		RawDataProcessors: rawDataProcessors,
 		Processor: processors,
 	}
 	gifHdr := &imageserver_image_gif.FallbackHandler{

@@ -11,6 +11,7 @@ import (
 //
 // If there is nothing to do, Handler does not decode the Image or call the Processor.
 type Handler struct {
+	RawDataProcessors []RawDataProcessor
 	Processor Processor // Optional Processor
 }
 
@@ -23,6 +24,22 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 		}
 		return nil, err
 	}
+	im, err = hdr.process(im, params, enc, format)
+	if err != nil {
+		return nil, err
+	}
+	for _, rawDataProcessor := range hdr.RawDataProcessors {
+		if rawDataProcessor.Change(im, params) {
+			im, err = rawDataProcessor.Process(im, params)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return im, err
+}
+
+func (hdr *Handler) process(im *imageserver.Image, params imageserver.Params, enc Encoder, format string) (*imageserver.Image, error) {
 	if !hdr.change(im, format, enc, params) {
 		return im, nil
 	}
