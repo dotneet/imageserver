@@ -9,6 +9,8 @@ import (
 
 	"github.com/pierrre/imageserver"
 	imageserver_source "github.com/pierrre/imageserver/source"
+	"image"
+	"bytes"
 )
 
 // Server is a imageserver.Server implementation that gets the Image from an HTTP URL.
@@ -86,7 +88,11 @@ func (srv *Server) identify(resp *http.Response, data []byte) (format string, er
 	}
 	format, err = idf(resp, data)
 	if err != nil {
-		return "", newSourceError(fmt.Sprintf("unable to identify image format: %s", err.Error()))
+		_,name,err := image.DecodeConfig(bytes.NewReader(data))
+		if err != nil {
+			return "", newSourceError(fmt.Sprintf("unable to identify image format: %s", err.Error()))
+		}
+		format = name
 	}
 	return format, nil
 }
